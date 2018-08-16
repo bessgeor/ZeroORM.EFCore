@@ -1,0 +1,3 @@
+[submodule "ZeroORM.Extensibility"]
+	path = ZeroORM.Extensibility
+	url = https://github.com/bessgeor/ZeroORM.Extensibility
