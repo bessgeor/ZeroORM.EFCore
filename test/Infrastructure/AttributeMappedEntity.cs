@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ZeroORM.EFCore.Test.Infrastructure
 {
-	[Table("AttributedEntity")]
+	[Table(TestDbContext.AttributedTableName)]
 	internal class AttributeMappedEntity
 	{
 		[Key]
@@ -12,7 +12,7 @@ namespace ZeroORM.EFCore.Test.Infrastructure
 		[NotMapped]
 		public string IgnoredProperty { get; set; }
 
-		[Column("StringData")]
+		[Column(TestDbContext.AttributedDataColumnName)]
 		public string SomeProperty { get; set; }
 	}
 }
