@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ZeroORM.Extensibility\ZeroORM.Extensibility.csproj" />
+    <ProjectReference Include="..\ZeroORM.Extensibility\src\ZeroORM.Extensibility.csproj" />
   </ItemGroup>
 
 </Project>
