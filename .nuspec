@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+	<metadata>
+		<id>ZeroORM.EFCore</id>
+		<version>$version$</version>
+		<authors>George Bessonov</authors>
+		<owners>bessgeor</owners>
+		<licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+		<projectUrl>https://github.com/bessgeor/ZeroORM.EFCore</projectUrl>
+		<iconUrl>http://github.com/bessgeor/ZeroORM/raw/master/icon.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>ZeroORM EFCore integration package</description>
+		<dependencies>		
+			<dependency id="ZeroORM.Extensibility" version="1.0.1" />
+			<dependency id="Microsoft.EntityFrameworkCore.Relational" version="2.0.3" />
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="src\bin\Release\**\*.*" target="lib" />
+	</files>
+</package>
