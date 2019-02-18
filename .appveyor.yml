@@ -1,12 +1,8 @@
 version: '{build}'
-dotnet_csproj:
-  patch: true
-  file: '**\*.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
+pull_requests:
+  do_not_increment_build_number: true
+nuget:
+  disable_publish_on_pr: true
 before_build:
   - dotnet restore
 build_script:
@@ -38,10 +34,6 @@ test_script:
       cd test
       dotnet test --no-restore -c Release
       cd ../
-artifacts:
-  - path: '**\*.nupkg'
-    name: package
-    type: NuGetPackage
 deploy:
   - provider: NuGet
     name: releaseOnNuget
