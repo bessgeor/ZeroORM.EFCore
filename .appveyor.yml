@@ -1,4 +1,4 @@
-version: '1.0.0-dev-{build}'
+version: '{build}'
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
@@ -11,7 +11,28 @@ before_build:
   - dotnet restore
 build_script:
   - dotnet build --no-restore -c Release
-  - ps: nuget pack -properties version=$Env:APPVEYOR_BUILD_VERSION
+  - ps: |
+      $versionTag = git describe --abbrev=0 --exact-match 2>&1 # powershell can't capture native errors from git
+      if ($versionTag -match 'fatal: no tag exactly matches')
+      {
+       $versionTag = $null
+      }
+      $latestVersionTag = git describe --abbrev=0
+      $devVersion = "$($latestVersionTag)-dev$($Env:APPVEYOR_BUILD_VERSION)"
+      $pathExtractor = [regex]::new("Successfully created package .(?<PackagePath>[^']+)'")
+      
+      $devMessage = nuget pack -properties version=$devVersion
+      $devPath = $pathExtractor.Match($devMessage).Groups['PackagePath'].Value
+      
+      Push-AppveyorArtifact $devPath -DeploymentName devPackage -Type NuGetPackage
+      
+      if ($versionTag -ne $null)
+      {
+        $releaseMessage = nuget pack -properties version=$versionTag
+        $releasePath = $pathExtractor.Match($releaseMessage).Groups['PackagePath'].Value
+        Push-AppveyorArtifact $releasePath -DeploymentName releasePackage -Type NuGetPackage
+      }
+
 test_script:
   - ps: |
       cd test
@@ -22,8 +43,18 @@ artifacts:
     name: package
     type: NuGetPackage
 deploy:
-  provider: NuGet
-  api_key:
-    secure: lEbBqFe17CfAfPuaLZLV7eli2hhs2c0qU2TAjq5uFHFZs2Od8CPYTc63lIzjYRn3
-  skip_symbols: false
-  artifact: package
+  - provider: NuGet
+    name: releaseOnNuget
+    api_key:
+      secure: lEbBqFe17CfAfPuaLZLV7eli2hhs2c0qU2TAjq5uFHFZs2Od8CPYTc63lIzjYRn3
+    skip_symbols: false
+    artifact: releasePackage
+    on:
+      appveyor_repo_tag: true
+  - provider: NuGet
+    name: nightlyOnMyGet
+    server: https://www.myget.org/F/zeroorm/api/v2/package
+    api_key:
+      secure: Kt4jCq+kUlKn+fnK00UOnXBLavTfrmy8wxmh9xbSHP5R3M3LEa8MAeBTwYtVrlQg
+    skip_symbols: false
+    artifact: devPackage
