@@ -40,6 +40,16 @@ namespace ZeroORM.EFCore.Test.Infrastructure
 				.HasOne( e => e.ConventionMappedEntity )
 				.WithMany()
 				.HasForeignKey( e => e.ConventionMappedEntityId );
+
+			EntityTypeBuilder<EntityWithShadowProperty> entityWithShadowPropertyMapper = builder.Entity<EntityWithShadowProperty>();
+
+			entityWithShadowPropertyMapper
+				.ToTable( "IHaveShadowProperty" )
+				.HasKey( e => e.Id );
+
+			entityWithShadowPropertyMapper
+				.HasOne( e => e.FluentMappedEntity )
+				.WithMany();
 		}
 	}
 }

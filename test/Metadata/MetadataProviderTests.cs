@@ -114,6 +114,19 @@ namespace ZeroORM.EFCore.Test.Metadata
 			.WithMessage( $@"Can't find column for the property ""IgnoredProperty"" of type ""{ typeof( AttributeMappedEntity ).FullName }""" );
 
 		[Fact]
+		public void MetadataProviderDontCrashIfShadowPropertyIsPresent()
+			=> (
+				(Action)(() => 
+					_context
+					.ZeroORM()
+					.GetTable<EntityWithShadowProperty>()
+					.GetColumnName( e => e.Id )
+				)
+			)
+			.Should()
+			.NotThrow();
+
+		[Fact]
 		public void MetadataProviderGetsFluentMappedEntityColumnName()
 			=> _context
 			.ZeroORM()

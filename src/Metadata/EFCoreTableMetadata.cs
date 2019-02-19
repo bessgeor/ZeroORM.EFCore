@@ -26,6 +26,7 @@ namespace ZeroORM.EFCore.Metadata
 			SchemaName = relationalMetadata.Schema;
 			efTableMetadata
 				.GetProperties()
+				.Where(prop => !prop.IsShadowProperty)
 				.Select( prop => (prop.PropertyInfo, RelationalProps: prop.Relational()) )
 				.Select( t => _columnNames.GetOrAdd( t.PropertyInfo, t.RelationalProps.ColumnName ) )
 				.ToArray();
