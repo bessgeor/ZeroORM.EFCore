@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,12 +8,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using ZeroORM.Extensibility.Metadata;
 using ZeroORM.Extensibility.Metadata.Exceptions;
 using ZeroORM.Extensibility.Common.Expressions;
+using System.Collections.Generic;
 
 namespace ZeroORM.EFCore.Metadata
 {
 	internal class EFCoreTableMetadata<TEntity> : ITableMetadata<TEntity>
 	{
-		private static readonly ConcurrentDictionary<PropertyInfo, string> _columnNames = new ConcurrentDictionary<PropertyInfo, string>();
+		private readonly Dictionary<PropertyInfo, string> _columnNames;
 
 		public string TableName { get; }
 		public string SchemaName { get; }
@@ -23,12 +23,12 @@ namespace ZeroORM.EFCore.Metadata
 		{
 			TableName = efTableMetadata.GetTableName();
 			SchemaName = efTableMetadata.GetSchema();
-			efTableMetadata
-				.GetProperties()
-				.Where(prop => !prop.IsShadowProperty())
-				.Select( prop => (prop.PropertyInfo, ColumnName: prop.GetColumnName()) )
-				.Select( t => _columnNames.GetOrAdd( t.PropertyInfo, t.ColumnName ) )
-				.ToArray();
+			_columnNames =
+				efTableMetadata
+					.GetProperties()
+					.Where( prop => !prop.IsShadowProperty() )
+					.ToDictionary( prop => prop.PropertyInfo, prop => prop.GetColumnName() )
+				;
 		}
 
 		public string GetColumnName<TProperty>( [NoCapture] Expression<Func<TEntity, TProperty>> accessor )
