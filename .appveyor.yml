@@ -38,7 +38,7 @@ deploy:
   - provider: NuGet
     name: releaseOnNuget
     api_key:
-      secure: lEbBqFe17CfAfPuaLZLV7eli2hhs2c0qU2TAjq5uFHFZs2Od8CPYTc63lIzjYRn3
+      secure: cMXDyTieSqQcDjJ/RgNTr1vOHdNrnS37rSvTlJDsP0JsfJji+IRQq1PJDmQYpkq/
     skip_symbols: false
     artifact: releasePackage
     on:
