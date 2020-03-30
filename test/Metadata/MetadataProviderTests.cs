@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using ZeroORM.EFCore.Test.Infrastructure;
@@ -116,7 +119,7 @@ namespace ZeroORM.EFCore.Test.Metadata
 		[Fact]
 		public void MetadataProviderDontCrashIfShadowPropertyIsPresent()
 			=> (
-				(Action)(() => 
+				(Action)(() =>
 					_context
 					.ZeroORM()
 					.GetTable<EntityWithShadowProperty>()
@@ -152,5 +155,49 @@ namespace ZeroORM.EFCore.Test.Metadata
 			.GetColumnName( e => e.SomeProperty )
 			.Should()
 			.Be( TestDbContext.AttributedDataColumnName );
+
+		[Fact]
+		public async Task OneMetadataMayBeUsedConcurrently()
+		{
+			IEnumerable<int> range = Enumerable.Range(0, 100);
+			TaskCompletionSource<int>[] tcs = range.Select( v => new TaskCompletionSource<int>() ).ToArray();
+			// threads usage makes concurrency multi-threaded explicitly which is the worst case for sync APIs
+			(int index, Thread thread)[] threads = range
+				.Select
+				(
+					index =>
+					(
+						index,
+						thread: new Thread
+						(
+							param =>
+							{
+								int v = (int) param;
+								try
+								{
+									_context
+										.ZeroORM()
+										.GetTable<AttributeMappedEntity>()
+										.GetColumnName( e => e.SomeProperty )
+										.Should()
+										.Be( TestDbContext.AttributedDataColumnName );
+									tcs[ v ].SetResult( v );
+								}
+								catch (Exception e)
+								{
+									tcs[ v ].SetException( e );
+								}
+							}
+						)
+					)
+				)
+				.ToArray()
+			;
+
+			foreach ( (int index, Thread thread) in threads )
+				thread.Start( index );
+
+			await Task.WhenAll( tcs.Select( v => v.Task ) ).ConfigureAwait( false );
+		}
 	}
 }
