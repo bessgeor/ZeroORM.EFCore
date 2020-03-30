@@ -21,14 +21,13 @@ namespace ZeroORM.EFCore.Metadata
 
 		public EFCoreTableMetadata( IEntityType efTableMetadata )
 		{
-			IRelationalEntityTypeAnnotations relationalMetadata = efTableMetadata.Relational();
-			TableName = relationalMetadata.TableName;
-			SchemaName = relationalMetadata.Schema;
+			TableName = efTableMetadata.GetTableName();
+			SchemaName = efTableMetadata.GetSchema();
 			efTableMetadata
 				.GetProperties()
-				.Where(prop => !prop.IsShadowProperty)
-				.Select( prop => (prop.PropertyInfo, RelationalProps: prop.Relational()) )
-				.Select( t => _columnNames.GetOrAdd( t.PropertyInfo, t.RelationalProps.ColumnName ) )
+				.Where(prop => !prop.IsShadowProperty())
+				.Select( prop => (prop.PropertyInfo, ColumnName: prop.GetColumnName()) )
+				.Select( t => _columnNames.GetOrAdd( t.PropertyInfo, t.ColumnName ) )
 				.ToArray();
 		}
 
