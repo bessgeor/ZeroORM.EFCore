@@ -11,7 +11,7 @@ using ZeroORM.Extensibility.Metadata.Exceptions;
 
 namespace ZeroORM.EFCore.Test.Metadata
 {
-	public class MetadataProviderTests
+	public class SingleMetadataProviderTests
 	{
 		private class UnmappedEntity
 		{
